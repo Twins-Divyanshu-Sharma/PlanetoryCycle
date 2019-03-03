@@ -18,7 +18,7 @@ public class ShaderProgram {
     private int programID;
     private int vertexID;
     private int fragmentID;
-    private Map<String, Integer> uniforms;
+    protected Map<String, Integer> uniforms;
     
     public ShaderProgram() throws Exception{
         uniforms = new HashMap<>();

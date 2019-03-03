@@ -5,6 +5,7 @@ import org.joml.Vector3f;
 
 import objects.Camera;
 import objects.GameObject;
+import objects.GuiObject;
 
 public class MatrixCalculator {
    private Matrix4f projectionMatrix = new Matrix4f();
@@ -36,6 +37,11 @@ public class MatrixCalculator {
 	   return transformationMatrix;
    }
    
+   public Matrix4f getTransformationMatrix(GuiObject gui){
+	   transformationMatrix.identity();
+	   transformationMatrix.translate( new Vector3f(gui.getPosition().x,gui.getPosition().y,0) );
+       return transformationMatrix;
+   }
    
    public Matrix4f getModelMatrix(GameObject go, Matrix4f viewMatrix){
 	   Vector3f rotation = go.getRotation();

@@ -1,9 +1,6 @@
 package base;
 
-import static org.lwjgl.opengl.GL11.GL_FILL;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_LINE;
-import static org.lwjgl.opengl.GL11.glPolygonMode;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.util.ArrayList;
 
@@ -12,7 +9,9 @@ import org.joml.Vector3f;
 
 import objects.Camera;
 import objects.GameObject;
+import objects.GuiObject;
 import objects.PointLight;
+import shader.GuiShader;
 import shader.ShaderProgram;
 import utility.MatrixCalculator;
 import utility.Reader;
@@ -25,6 +24,7 @@ public class Renderer {
      private MatrixCalculator matrixCal = new MatrixCalculator();
      
      private ShaderProgram shaderProgram;
+     private GuiShader guiShader;
      
      private float specularPower = 10f;
 
@@ -43,9 +43,14 @@ public class Renderer {
          // Create lighting related uniforms
          shaderProgram.createUniform("specularPower");
          shaderProgram.createUniform("ambientLight");
-         shaderProgram.createPointLightUniform("pointLight");
-    	 
+         shaderProgram.createPointLightUniform("pointLight");    
+         
+         guiShader = new GuiShader();
+         guiShader.initialize();
      }
+     
+     
+     
      
      public void render(double dt, ArrayList<GameObject> objList, Camera camera,  Vector3f ambientLight, PointLight pointLight){
     	shaderProgram.bind();
@@ -68,6 +73,28 @@ public class Renderer {
     	 shaderProgram.unbind();
      }
      
+     public void renderGui(double dt, ArrayList<GuiObject> guiList){
+   	    glEnable(GL_BLEND);
+   	    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    	 
+    	guiShader.bind();
+    	 guiShader.setUniform("sampler", 0);
+    	 for(GuiObject gui : guiList){
+    		  Matrix4f transformationMatrix = matrixCal.getTransformationMatrix(gui);
+    		  guiShader.setUniform("transformationMatrix",transformationMatrix);
+    		  guiShader.setUniform("color", gui.getColor());
+    		  guiShader.setUniform("hasTexture",gui.isTextured());
+    		  gui.getMesh().render(dt, gui.isTextured(), gui.getTexture());
+    	 }
+
+    	 
+    	 guiShader.unbind();
+          
+    	 glDisable(GL_BLEND);
+         glEnable(GL_ALPHA_TEST);
+         glAlphaFunc(GL_GREATER,0.1f);
+    
+    }
      
      
      public void wireframe(boolean wireFrame){

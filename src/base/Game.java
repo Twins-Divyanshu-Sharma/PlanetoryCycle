@@ -1,6 +1,12 @@
 package base;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_G;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_M;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_V;
 
 import java.util.ArrayList;
 
@@ -13,6 +19,7 @@ import objects.Camera;
 import objects.Chandra;
 import objects.GameObject;
 import objects.Greha;
+import objects.GuiObject;
 import objects.Material;
 import objects.Mesh;
 import objects.MouseInput;
@@ -29,6 +36,8 @@ public class Game {
      private ArrayList<GameObject> objList = new ArrayList<GameObject>();
      private ArrayList<GameObject> objList2 = new ArrayList<GameObject>();
      private ArrayList<GameObject> cometList = new ArrayList<GameObject>();
+     
+     private ArrayList<GuiObject> guiList = new ArrayList<GuiObject>();
      
      private Camera camera;
      private Player player;
@@ -57,8 +66,7 @@ public class Game {
      
      private Mesh ulkaMesh;
      private GameObject gg;
-     
-     private ArrayList<GameObject> gglist = new ArrayList<GameObject>();
+
      
      public Game(Window window){
     	 this.window = window;
@@ -121,6 +129,13 @@ public class Game {
     	 camera = new Camera();
     	 camera.setPosition(-3.489f, 8.083f, -16.83f);
     	 camera.setRotation(32.87f, -190.4f, 0f);
+    	 
+    	 //////////////// GUIS////////////////////////////
+    	 Vector2f test0Pos = new Vector2f(-0.5f,0.5f);
+    	 Vector4f test0Color = new Vector4f(0.0f, 0.5f, 0.8f , 0.4f);
+    	 GuiObject test0 = new GuiObject(test0Pos,test0Color,0.5f,0.2f);
+    	 guiList.add(test0);
+    	 
      }
      
      
@@ -181,10 +196,7 @@ public class Game {
     	 camera.moveDistance(forward*CAMERA_POS_STEP);
     	 camera.strafeDistance(strafe*CAMERA_POS_STEP);
     		 Vector2f rotVec = mi.getDispPos();
-    		 camera.moveRotation(rotVec.x * MOUSE_SENSTIVITY, rotVec.y*MOUSE_SENSTIVITY, 0);
-    		 
-    		// System.out.println(camera.getPosition()+ " " + camera.getRotation());
-    		 
+    		 camera.moveRotation(rotVec.x * MOUSE_SENSTIVITY, rotVec.y*MOUSE_SENSTIVITY, 0);    		 
     	earth.update(sun);
     	venus.update(sun);
     	moon.update(earth);
@@ -204,6 +216,8 @@ public class Game {
      public void render(double dt){
            renderer.render(dt, objList, camera, ambientLight, sun.getLight());
            renderer.render(dt, cometList, camera, ambientLight, sun.getLight());
+           
+           renderer.renderGui(dt, guiList);
      }
      
      public void cleanUp(){
@@ -214,6 +228,9 @@ public class Game {
     	 }
     	 for(GameObject go : objList2){
     		 go.cleanUp();
+    	 }
+    	 for(GuiObject gui : guiList){
+    		 gui.cleanUp();
     	 }
 
      }
