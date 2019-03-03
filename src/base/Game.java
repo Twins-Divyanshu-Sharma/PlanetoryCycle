@@ -207,7 +207,7 @@ public class Game {
      }
      
      public void cleanUp(){
-    	 System.out.println("Cleaning");
+
     	 renderer.cleanUp();
     	 for(GameObject go : objList){
     		 go.cleanUp();
