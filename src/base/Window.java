@@ -10,11 +10,10 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 
 public class Window {
-	private static int width = 1366;
-	private static int height = 768;
+	public static int width = 1366;
+	public static int height = 768;
 	private static String name = "WateryGame";
 	private long win;
-	private boolean[] keys = new boolean[65536];
 
 	
     public Window(){
@@ -30,12 +29,6 @@ public class Window {
     	if(win==NULL){
     		System.out.println("unable to create window");
     	}
-    	
- 	   glfwSetKeyCallback(win, (window,key,scancode,action,mode)->{
-		   if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-			   glfwSetWindowShouldClose(win,true);
-		   keys[key] = action != GLFW_RELEASE;
-	   });
     
     	
     	glfwMakeContextCurrent(win);
@@ -65,6 +58,10 @@ public class Window {
  	   glfwPollEvents();
     }
     
+    public void setClearColor(float r, float g, float b){
+    	glClearColor(r,g,b,1f);
+    }
+    
     public void clear(){
  	   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
  	   
@@ -86,11 +83,21 @@ public class Window {
     }
     
     public boolean isKeyPressed(int key){
-    	return keys[key];
+    	int state = glfwGetKey(win, key);
+    	return (state != GLFW_RELEASE);
     }
+    
+    public boolean isKeyTyped(int key){
+    	int state = glfwGetKey(win, key);
+    	return (state == GLFW_REPEAT);
+    }
+    
     public long getWindowHandle(){
     	return win;
     }
     
+    public void close(){
+    	glfwSetWindowShouldClose(win,true);
+    }
 
 }

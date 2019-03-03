@@ -19,6 +19,8 @@ public class MouseInput {
   private Vector2d prevPos;
   private Vector2d currPos;
   private Vector2f dispPos;
+  private Vector2f glPos;
+
   
   private boolean inWindow= false;
   private boolean leftButtonPressed = false;
@@ -32,6 +34,7 @@ public class MouseInput {
 	  prevPos = new Vector2d(-1,-1);
 	  currPos = new Vector2d(0,0);
 	  dispPos = new Vector2f();
+	  glPos = new Vector2f();
   }
   
   public void init(Window win){
@@ -93,6 +96,12 @@ public class MouseInput {
   public Vector2f getDispPos(){
 	  return dispPos;
   }
+  public Vector2f getGlPos(){
+	  glPos.x = (float)((currPos.x*2 / Window.width )-1f);
+	  glPos.y = (float)(1f - (currPos.y*2/Window.height));
+	  return glPos;
+  }
+  
   public void input(Window win){
 	  dispPos.x = 0; dispPos.y = 0;
 	  if(prevPos.x > 0 && prevPos.y > 0 /*&& inWindow*/){
@@ -110,6 +119,8 @@ public class MouseInput {
 
 	  prevPos.x = currPos.x;
 	  prevPos.y = currPos.y;
+	  
+
   }
   
   public boolean isLeftButtonPressed(){

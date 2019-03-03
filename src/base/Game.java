@@ -1,12 +1,7 @@
 package base;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_G;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_M;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_V;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.util.ArrayList;
 
@@ -29,7 +24,15 @@ import objects.Texture;
 import objects.Ulkapind;
 
 
+
 public class Game {
+	public boolean newGame = true;
+	
+     public enum State  {
+			MENU , INGAME, QUIT
+	};
+	
+	 public State state = State.MENU;
 	
      private Renderer renderer;
      private Window window;
@@ -37,7 +40,9 @@ public class Game {
      private ArrayList<GameObject> objList2 = new ArrayList<GameObject>();
      private ArrayList<GameObject> cometList = new ArrayList<GameObject>();
      
-     private ArrayList<GuiObject> guiList = new ArrayList<GuiObject>();
+     private ArrayList<GuiObject> hudList = new ArrayList<GuiObject>();
+     
+     private ArrayList<GuiObject> baseMenuList = new ArrayList<GuiObject>();
      
      private Camera camera;
      private Player player;
@@ -65,7 +70,7 @@ public class Game {
      private boolean layer1 = true;
      
      private Mesh ulkaMesh;
-     private GameObject gg;
+     private Vector3f menuBG = new Vector3f(0.2f,0.7f,0.6f);
 
      
      public Game(Window window){
@@ -130,11 +135,11 @@ public class Game {
     	 camera.setPosition(-3.489f, 8.083f, -16.83f);
     	 camera.setRotation(32.87f, -190.4f, 0f);
     	 
-    	 //////////////// GUIS////////////////////////////
-    	 Vector2f test0Pos = new Vector2f(-0.5f,0.5f);
-    	 Vector4f test0Color = new Vector4f(0.0f, 0.5f, 0.8f , 0.4f);
-    	 GuiObject test0 = new GuiObject(test0Pos,test0Color,0.5f,0.2f);
-    	 guiList.add(test0);
+    	 //////////////// GUIS ////////////////////////////
+    	 Vector2f test0Pos = new Vector2f(-1f,1f);
+    	 Vector4f test0Color = new Vector4f(menuBG, 0.4f);
+    	 GuiObject test0 = new GuiObject(test0Pos,test0Color,2f,2f);
+    	 baseMenuList.add(test0);
     	 
      }
      
@@ -143,6 +148,18 @@ public class Game {
      public void input(Window window, MouseInput mi){
     	 cameraInc.set(0,0,0);
     	 forward = 0; strafe = 0;
+    	 if(window.isKeyPressed(GLFW_KEY_O)){
+    		 state = State.QUIT;
+    	 }
+    	 
+    	 if(window.isKeyPressed(GLFW_KEY_ESCAPE) && state == State.INGAME){
+    		state = State.MENU;
+    	 }
+    	 if(window.isKeyPressed(GLFW_KEY_BACKSPACE) && state == State.MENU){
+    		 state = State.INGAME;
+    	 }
+    	 
+    	 
     	 if(window.isKeyPressed(GLFW_KEY_UP)){
     		 cameraInc.z = -1;
     		 forward = 1;
@@ -175,7 +192,21 @@ public class Game {
      }
      
      public void update(MouseInput mi){
+    	 if(state == State.INGAME){
+    		 updateInGame(mi);
+    	 }else if(state == State.MENU){
+    		 updateMenu(mi);
+    	 }
+     }
+     
+     public void updateMenu(MouseInput mi){
     	 
+     }
+     
+     
+     
+     public void updateInGame(MouseInput mi){
+       
     	 
     	 t += dt;
     	 if( t >= limit0 && !lm0bool){
@@ -196,7 +227,10 @@ public class Game {
     	 camera.moveDistance(forward*CAMERA_POS_STEP);
     	 camera.strafeDistance(strafe*CAMERA_POS_STEP);
     		 Vector2f rotVec = mi.getDispPos();
-    		 camera.moveRotation(rotVec.x * MOUSE_SENSTIVITY, rotVec.y*MOUSE_SENSTIVITY, 0);    		 
+    		 camera.moveRotation(rotVec.x * MOUSE_SENSTIVITY, rotVec.y*MOUSE_SENSTIVITY, 0);  
+    		 
+    	System.out.println(mi.getGlPos());	
+    		 
     	earth.update(sun);
     	venus.update(sun);
     	moon.update(earth);
@@ -214,10 +248,23 @@ public class Game {
      }
      
      public void render(double dt){
-           renderer.render(dt, objList, camera, ambientLight, sun.getLight());
-           renderer.render(dt, cometList, camera, ambientLight, sun.getLight());
-           
-           renderer.renderGui(dt, guiList);
+         if(state == state.INGAME){
+        	 renderScene(dt);
+         }else if(state == state.MENU){
+        	 renderMenu(dt);
+         }
+     }
+     
+     public void renderScene(double dt){
+         renderer.render(dt, objList, camera, ambientLight, sun.getLight());
+         renderer.render(dt, cometList, camera, ambientLight, sun.getLight());
+         renderer.renderGui(dt, hudList);
+     }
+     
+     public void renderMenu(double dt){
+         renderer.render(dt, objList, camera, ambientLight, sun.getLight());
+         renderer.render(dt, cometList, camera, ambientLight, sun.getLight());
+    	 renderer.renderGui(dt, baseMenuList);
      }
      
      public void cleanUp(){
@@ -229,9 +276,13 @@ public class Game {
     	 for(GameObject go : objList2){
     		 go.cleanUp();
     	 }
-    	 for(GuiObject gui : guiList){
+    	 for(GuiObject gui : hudList){
     		 gui.cleanUp();
     	 }
 
+     }
+     
+     public boolean shouldQuit(){
+    	 return (state == State.QUIT);
      }
 }
