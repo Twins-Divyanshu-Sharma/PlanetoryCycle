@@ -3,7 +3,12 @@ package objects;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
+import base.CursorOn;
+
 public class GuiObject {
+  public static float buttonWIDTH = 0.5f;	
+  public static float buttonHEIGHT = 0.125f;	
+	
    private Vector2f position;
    private float height;
    private float width;
@@ -18,6 +23,10 @@ public class GuiObject {
    
    private GuiMesh mesh;
    
+   
+   public boolean isButton = false;
+   public CursorOn id = CursorOn.NOWHERE;
+   
    public GuiObject(Vector2f position, Vector4f color, float width, float height){  // untextured
 	   this.position = position;
 	   this.color = color;
@@ -28,8 +37,9 @@ public class GuiObject {
 	   fromSpriteSheet = false;
    }
    
-   public GuiObject(String texLoc, float width, float height) throws Exception{
+   public GuiObject(Vector2f position, String texLoc, float width, float height) throws Exception{
 	   tex = new Texture(texLoc);
+	   this.position = position;
 	   this.width = width;
 	   this.height = height;
 	   mesh = new GuiMesh(width,height);
@@ -45,7 +55,7 @@ public class GuiObject {
 	   mesh  = new GuiMesh(ss,row,col,width, height);
 	   iCameFrom = ss;
 	   textured = true;
-	   fromSpriteSheet = false;
+	   fromSpriteSheet = true;
    }
    
    
@@ -98,6 +108,11 @@ public GuiMesh getMesh(){
 
 public void cleanUp(){
 	mesh.cleanUp();
+}
+
+public void setButton(CursorOn buttonId){
+	this.id = buttonId;
+	this.isButton = true;
 }
 
 

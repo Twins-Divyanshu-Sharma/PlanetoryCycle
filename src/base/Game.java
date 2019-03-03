@@ -19,6 +19,7 @@ import objects.Material;
 import objects.Mesh;
 import objects.MouseInput;
 import objects.Player;
+import objects.SpriteSheet;
 import objects.Surya;
 import objects.Texture;
 import objects.Ulkapind;
@@ -30,10 +31,14 @@ public class Game {
 	
      public enum State  {
 			MENU , INGAME, QUIT
-	};
+	}
 	
+
 	 public State state = State.MENU;
-	
+
+	 public CursorOn  buttonId = CursorOn.NOWHERE;
+	 
+	 
      private Renderer renderer;
      private Window window;
      private ArrayList<GameObject> objList = new ArrayList<GameObject>();
@@ -42,7 +47,7 @@ public class Game {
      
      private ArrayList<GuiObject> hudList = new ArrayList<GuiObject>();
      
-     private ArrayList<GuiObject> baseMenuList = new ArrayList<GuiObject>();
+     
      
      private Camera camera;
      private Player player;
@@ -72,6 +77,15 @@ public class Game {
      private Mesh ulkaMesh;
      private Vector3f menuBG = new Vector3f(0.2f,0.7f,0.6f);
 
+     ///////////////////////////// GUI /////////////////////////////////////
+     private GuiObject bg;
+     private GuiObject buttonHighlight; private boolean renderHighlight = false;
+     private ArrayList<GuiObject> currMenu;
+     private GuiObject cursor;
+     
+     
+     private ArrayList<GuiObject> baseMenu = new ArrayList<GuiObject>(); 
+     private ArrayList<GuiObject> helpMenu = new ArrayList<GuiObject>();
      
      public Game(Window window){
     	 this.window = window;
@@ -136,11 +150,38 @@ public class Game {
     	 camera.setRotation(32.87f, -190.4f, 0f);
     	 
     	 //////////////// GUIS ////////////////////////////
-    	 Vector2f test0Pos = new Vector2f(-1f,1f);
-    	 Vector4f test0Color = new Vector4f(menuBG, 0.4f);
-    	 GuiObject test0 = new GuiObject(test0Pos,test0Color,2f,2f);
-    	 baseMenuList.add(test0);
+    	 Vector2f bgPos = new Vector2f(-1f,1f);
+    	 Vector4f bgColor = new Vector4f(menuBG, 1f);
+    	 bg = new GuiObject(bgPos,bgColor,2f,2f);
     	 
+    	 buttonHighlight = new GuiObject(new Vector2f(0,0), new Vector4f(1f,1f,1f,0.3f),GuiObject.buttonWIDTH, GuiObject.buttonHEIGHT);
+    	 
+    	 float sizeX = (64f/Window.width); float sizeY = (64f/Window.height);
+    	 cursor  = new GuiObject(new Vector2f(0f,0f),"Cursor.png",sizeX,sizeY);   	
+    	 
+    	 // baseMenuButtons
+    	 GuiObject resume = new GuiObject(new Vector2f(-0.3f,0.5f), new Vector4f(0.1f,0.6f,0.3f,1f),GuiObject.buttonWIDTH, GuiObject.buttonHEIGHT);
+         resume.setButton(CursorOn.RESUME);
+         baseMenu.add(resume);
+         
+         GuiObject help = new GuiObject(new Vector2f(-0.3f,0f), new Vector4f(0.1f,0.6f,0.3f,1f),GuiObject.buttonWIDTH, GuiObject.buttonHEIGHT);
+         help.setButton(CursorOn.HELP);
+         baseMenu.add(help);
+         
+         
+         GuiObject quit = new GuiObject(new Vector2f(-0.3f,-0.5f), new Vector4f(0.1f,0.6f,0.3f,1f),GuiObject.buttonWIDTH, GuiObject.buttonHEIGHT);
+         quit.setButton(CursorOn.QUIT);
+         baseMenu.add(quit);
+         
+         // help Menu
+         GuiObject back = new GuiObject(new Vector2f(0.2f,-0.8f), new Vector4f(0.1f,0.6f,0.3f,1f),GuiObject.buttonWIDTH, GuiObject.buttonHEIGHT);
+         back.setButton(CursorOn.BACK);
+         helpMenu.add(back);
+       
+         GuiObject instruction = new GuiObject(new Vector2f(-0.8f,0.8f), new Vector4f(0.8f,0.6f,0.1f,1f), 1.5f,1.5f);
+         helpMenu.add(instruction);
+         
+         currMenu = baseMenu;
      }
      
      
@@ -148,16 +189,16 @@ public class Game {
      public void input(Window window, MouseInput mi){
     	 cameraInc.set(0,0,0);
     	 forward = 0; strafe = 0;
-    	 if(window.isKeyPressed(GLFW_KEY_O)){
+    	/* if(window.isKeyPressed(GLFW_KEY_O)){
     		 state = State.QUIT;
-    	 }
+    	 }*/
     	 
     	 if(window.isKeyPressed(GLFW_KEY_ESCAPE) && state == State.INGAME){
     		state = State.MENU;
     	 }
-    	 if(window.isKeyPressed(GLFW_KEY_BACKSPACE) && state == State.MENU){
+    	/* if(window.isKeyPressed(GLFW_KEY_BACKSPACE) && state == State.MENU){
     		 state = State.INGAME;
-    	 }
+    	 }*/
     	 
     	 
     	 if(window.isKeyPressed(GLFW_KEY_UP)){
@@ -200,13 +241,16 @@ public class Game {
      }
      
      public void updateMenu(MouseInput mi){
-    	 
+    	 mi.setMenuMovement(true);
+    	 cursor.setPosition(mi.getGlPos());
+    	 this.cursorCollision();
+    	 if(mi.isLeftButtonPressed()){
+    		 onClick();
+    	 }
      }
-     
-     
-     
+        
      public void updateInGame(MouseInput mi){
-       
+       mi.setMenuMovement(false);
     	 
     	 t += dt;
     	 if( t >= limit0 && !lm0bool){
@@ -262,9 +306,12 @@ public class Game {
      }
      
      public void renderMenu(double dt){
-         renderer.render(dt, objList, camera, ambientLight, sun.getLight());
-         renderer.render(dt, cometList, camera, ambientLight, sun.getLight());
-    	 renderer.renderGui(dt, baseMenuList);
+    	 // decreasing order ... I know its weird
+    	 renderer.renderSingleGui(dt,cursor);
+    	 if(this.renderHighlight)
+    		 renderer.renderSingleGui(dt, buttonHighlight);
+    	 renderer.renderGui(dt,this.currMenu);
+    	 renderer.renderSingleGui(dt, bg);
      }
      
      public void cleanUp(){
@@ -285,4 +332,47 @@ public class Game {
      public boolean shouldQuit(){
     	 return (state == State.QUIT);
      }
+     
+     
+     
+     
+     
+     
+     //////////////////////////////  HARD CODED MENU SYSTEM /////////////////////////////
+     public void onClick(){
+    	 if(state == State.MENU){ // do clicky things only in menu state
+    		 if(buttonId == CursorOn.RESUME){
+    			 state = State.INGAME;
+    		 }else if(buttonId == CursorOn.QUIT){
+    			 state = State.QUIT;
+    		 }else if(buttonId == CursorOn.HELP){
+    			 currMenu = helpMenu;
+    		 }else if(buttonId == CursorOn.BACK){
+    			 currMenu = baseMenu;
+    		 }
+    	 }
+     }
+     
+     
+     public void cursorCollision(){
+    	 boolean somewhere = false;
+    	 if(state == State.MENU){ // check only if in menu
+    		 for(GuiObject gui : this.currMenu){
+    			 if(gui.isButton && collidedWith(cursor.getPosition(),gui)){ // if gui is button and mouse on it
+    				this.buttonId = gui.id;
+    				this.buttonHighlight.setPosition(gui.getPosition());
+    				somewhere = true;
+    			 }
+    		 }
+    	 }
+    	 this.renderHighlight = somewhere;
+     }
+     
+     public boolean collidedWith(Vector2f cursorPos, GuiObject gui){
+    	 boolean xCollision = (cursorPos.x >= gui.getPosition().x	&& cursorPos.x <= gui.getPosition().x + gui.getWidth() );
+    	 boolean yCollision = (cursorPos.y <= gui.getPosition().y	&& cursorPos.y >= gui.getPosition().y - gui.getHeight() );
+    	 return xCollision && yCollision;
+     }
+     
+     
 }

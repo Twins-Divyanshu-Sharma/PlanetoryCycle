@@ -95,6 +95,26 @@ public class Renderer {
          glAlphaFunc(GL_GREATER,0.1f);
     
     }
+     // single gui
+     public void renderSingleGui(double dt, GuiObject gui){
+    	    glEnable(GL_BLEND);
+    	    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+     	 
+     	guiShader.bind();
+     	 guiShader.setUniform("sampler", 0);
+     		  Matrix4f transformationMatrix = matrixCal.getTransformationMatrix(gui);
+     		  guiShader.setUniform("transformationMatrix",transformationMatrix);
+     		  guiShader.setUniform("color", gui.getColor());
+     		  guiShader.setUniform("hasTexture",gui.isTextured());
+     		  gui.getMesh().render(dt, gui.isTextured(), gui.getTexture());
+	 
+     	 guiShader.unbind();
+           
+     	 glDisable(GL_BLEND);
+          glEnable(GL_ALPHA_TEST);
+          glAlphaFunc(GL_GREATER,0.1f);
+     
+     }
      
      
      public void wireframe(boolean wireFrame){

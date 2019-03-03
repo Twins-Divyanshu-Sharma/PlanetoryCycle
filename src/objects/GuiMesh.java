@@ -126,13 +126,13 @@ public class GuiMesh {
 			 	   0+width, 0-height, // bottom right
 		   };
 		   float[] tempTexCoord = {
-				   1, 0,  // top left
-				   1, 1,  // top right
-				   0, 0,  // bottom left
-				   0, 1,  // bottom right
+				   0, 0,  // top left
+				   1, 0,  // top right
+				   0, 1,  // bottom left
+				   1, 1,  // bottom right
 		   };
 		   int[] tempIndices = {
-				   0, 1, 2 , 2, 1, 3,
+				   0, 1, 2, 2, 1, 3,
 		   };
 		   setBuffers(tempPos, tempTexCoord, tempIndices);
 	   }
@@ -145,10 +145,10 @@ public class GuiMesh {
 			 	   0+width, 0-height, // bottom right
 		   };
 		   float[] tempTexCoord = {
-				   0+ss.getDw()*(float)(col), 0 + ss.getDh()*(float)(ss.getRows() - row),  // top left
-				   0+ss.getDw()*(float)(col+1), 0 + ss.getDh()*(float)(ss.getRows() - row),  // top right
-				   0+ss.getDw()*(float)(col), 0 + ss.getDh()*(float)(ss.getRows() - row -1), // bottom left
-				   0+ss.getDw()*(float)(col+1),  0 + ss.getDh()*(float)(ss.getRows() - row -1),  // bottom right
+				   0+ss.getDw()*(float)(col), 0 + ss.getDh()*(float)(row),  // top left
+				   0+ss.getDw()*(float)(col+1), 0 + ss.getDh()*(float)(row),  // top right
+				   0+ss.getDw()*(float)(col), 0 + ss.getDh()*(float)(row +1), // bottom left
+				   0+ss.getDw()*(float)(col+1),  0 + ss.getDh()*(float)(row +1),  // bottom right
 		   };
 		   int[] tempIndices = {
 				   0, 1, 2 , 2, 1, 3,

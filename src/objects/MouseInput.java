@@ -37,17 +37,25 @@ public class MouseInput {
 	  glPos = new Vector2f();
   }
   
+  private boolean menuMove = false;
+  
+  public void setMenuMovement(boolean menu){
+	  menuMove = menu;
+  }
+  
   public void init(Window win){
 	  glfwSetCursorPosCallback(win.getWindowHandle(),cursorPosCallback = new GLFWCursorPosCallback(){
 		 public void invoke(long window, double xPos, double yPos){
-			 if(currPos.y >= 3*768/4 || currPos.y <= 768/4 ){
+			 if(!menuMove){
+			 if(currPos.y >= 3*Window.height/4 || currPos.y <= Window.height/4){
 			       glfwSetCursorPos(win.getWindowHandle(),1366/2,756/2);
 			       prevPos.x = 0; prevPos.y=0;
 			  }
-			  if(currPos.x >= 3*1366/4 || currPos.x <= 1366/4 ){
+			  if(currPos.x >= 3*Window.width/4 || currPos.x <= Window.width/4 ){
 				   glfwSetCursorPos(win.getWindowHandle(),1366/2,756/2);
 				   prevPos.x = 0; prevPos.y=0;
 			  }
+			 }
 			 currPos.x = xPos;
 			 currPos.y = yPos;
 			 
@@ -129,4 +137,6 @@ public class MouseInput {
   public boolean isRightButtonPressed(){
 	  return rightButtonPressed;
   }
+  
+  
 }
