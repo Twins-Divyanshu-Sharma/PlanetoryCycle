@@ -63,10 +63,12 @@ public class Renderer {
          shaderProgram.setUniform("specularPower", specularPower);
          shaderProgram.setUniform("pointLight", pointLight);
     	 for(GameObject go : objList){
+    		 if(go.willRender()){
     		  Matrix4f transformationMatrix = matrixCal.getTransformationMatrix(go);
     		  shaderProgram.setUniform("transformationMatrix",transformationMatrix);
     		  shaderProgram.setUniform("material", go.getMesh().getMaterial());
     	      go.render(dt);
+    		 }
     	 }
 
     	 

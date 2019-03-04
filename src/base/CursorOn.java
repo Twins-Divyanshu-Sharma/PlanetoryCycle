@@ -1,5 +1,5 @@
 package base;
 
 public enum CursorOn {
-		NOWHERE, PLAY, RESUME, HELP, QUIT, BACK, NEWGAME
+		NOWHERE, PLAY, RESUME, HELP, QUIT, BACK, GAMEOVER
 }

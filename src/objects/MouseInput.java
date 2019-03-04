@@ -32,7 +32,7 @@ public class MouseInput {
   
   public MouseInput(){
 	  prevPos = new Vector2d(-1,-1);
-	  currPos = new Vector2d(0,0);
+	  currPos = new Vector2d(1,1);
 	  dispPos = new Vector2f();
 	  glPos = new Vector2f();
   }
@@ -110,7 +110,7 @@ public class MouseInput {
 	  return glPos;
   }
   
-  public void input(Window win){
+ public void input(Window win){
 	  dispPos.x = 0; dispPos.y = 0;
 	  if(prevPos.x > 0 && prevPos.y > 0 /*&& inWindow*/){
 		  double deltaX = currPos.x - prevPos.x;

@@ -79,7 +79,8 @@ public class Ulkapind extends GameObject{
 			//double dist = (i.getPosition().x - this.getPosition().x)*(i.getPosition().x - this.getPosition().x) + (i.getPosition().y - this.getPosition().y)*(i.getPosition().y - this.getPosition().y);
 			double dist = i.getPosition().distance(this.getPosition());
 			if(dist < r + radius){
-				System.out.println("collided with "+j);
+				//System.out.println("collided with "+j);
+				//i.setDead(true);
 				return true;
 			}
 		}

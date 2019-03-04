@@ -1,19 +1,8 @@
 package objects;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glDrawElements;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glDeleteBuffers;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
@@ -24,6 +13,7 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.system.MemoryUtil;
 
 public class GuiMesh {
@@ -42,19 +32,13 @@ public class GuiMesh {
 		setBuffers();
 		generate();
 	}
-	
-
-	
+		
 	public GuiMesh(SpriteSheet ss,int row, int col, float width, float height) throws Exception{  // textured spritesheet	
 		this.width = width;
 	    this.height = height;
 	    setBuffers(ss,row, col);
 	    generate();
 	}
-	
-
-	   
-	   
 	
     public void generate(){
     	vao = glGenVertexArrays();
@@ -74,7 +58,7 @@ public class GuiMesh {
     	//textureBuffer.put(textures).flip();
     	textureVbo = glGenBuffers();
     	glBindBuffer(GL_ARRAY_BUFFER,textureVbo);
-    	glBufferData(GL_ARRAY_BUFFER,textures,GL_STATIC_DRAW);
+    	glBufferData(GL_ARRAY_BUFFER,textures,GL_DYNAMIC_DRAW);
     	glVertexAttribPointer(1,2,GL_FLOAT,false,0,0);
     	
     	////////////////////index////////////////////////////
@@ -169,6 +153,12 @@ public class GuiMesh {
     	
     	glBindVertexArray(0);
     	glDeleteVertexArrays(vao);
+    }
+    
+    public void changeTextures(float[] texCoords){
+    	glBindBuffer(GL_ARRAY_BUFFER, textureVbo);	
+    	GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, texCoords);
+    	glBindBuffer(GL_ARRAY_BUFFER,0);
     }
   
     

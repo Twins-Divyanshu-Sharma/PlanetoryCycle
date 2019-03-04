@@ -14,6 +14,7 @@ import objects.Camera;
 import objects.Chandra;
 import objects.GameObject;
 import objects.Greha;
+import objects.GuiNumbers;
 import objects.GuiObject;
 import objects.Material;
 import objects.Mesh;
@@ -27,6 +28,10 @@ import objects.Ulkapind;
 
 
 public class Game {
+	private int netCycles=0;
+	private int netJumps=0;
+	private int finalScore=0;
+	
 	public boolean newGame = true;
 	
      public enum State  {
@@ -86,6 +91,14 @@ public class Game {
      
      private ArrayList<GuiObject> baseMenu = new ArrayList<GuiObject>(); 
      private ArrayList<GuiObject> helpMenu = new ArrayList<GuiObject>();
+     private GuiObject resume;
+     private GuiObject newgame;
+     private GuiObject help;
+     
+     private GuiObject gameOver;
+     private GuiNumbers guiNetNumbers;
+     private GuiNumbers guiNetJumps;
+     
      
      public Game(Window window){
     	 this.window = window;
@@ -93,7 +106,7 @@ public class Game {
      }
      
      public void init() throws Exception{
-         ambientLight = new Vector3f(0.1f, 0.1f, 0.1f);    	 
+         ambientLight = new Vector3f(0.5f, 0.5f, 0.5f);    	 
          String planetOBJ = "planet.obj";
     	 String suryaObj = "sun.obj";
     	 String cometObj = "comet.obj";
@@ -159,12 +172,29 @@ public class Game {
     	 float sizeX = (64f/Window.width); float sizeY = (64f/Window.height);
     	 cursor  = new GuiObject(new Vector2f(0f,0f),"Cursor.png",sizeX,sizeY);   	
     	 
+    	 // numbers
+    	 SpriteSheet numAtlas = new SpriteSheet("squareNumb.png",4,4);
+    	 this.guiNetNumbers = new GuiNumbers(numAtlas,new Vector2f(-0.95f,0.8f));
+    	 for(int i=0; i<guiNetNumbers.getLetters().length; i++){
+    		 hudList.add(guiNetNumbers.getLetters()[i]);
+    	 }
+    	 this.guiNetJumps = new GuiNumbers(numAtlas,new Vector2f(0.6f,0.8f));
+    	 for(int i=0; i<guiNetJumps.getLetters().length; i++){
+    		 hudList.add(guiNetJumps.getLetters()[i]);
+    	 }
+    	 
     	 // baseMenuButtons
-    	 GuiObject resume = new GuiObject(new Vector2f(-0.3f,0.5f), new Vector4f(0.1f,0.6f,0.3f,1f),GuiObject.buttonWIDTH, GuiObject.buttonHEIGHT);
+    	 newgame = new GuiObject(new Vector2f(-0.3f,0.5f), new Vector4f(0.4f,0.4f,0.8f,1f),GuiObject.buttonWIDTH, GuiObject.buttonHEIGHT);
+    	 newgame.setButton(CursorOn.RESUME);
+    	 baseMenu.add(newgame);
+    	 
+    	 resume = new GuiObject(new Vector2f(-0.3f,0.5f), new Vector4f(0.1f,0.6f,0.3f,1f),GuiObject.buttonWIDTH, GuiObject.buttonHEIGHT);
          resume.setButton(CursorOn.RESUME);
-         baseMenu.add(resume);
          
-         GuiObject help = new GuiObject(new Vector2f(-0.3f,0f), new Vector4f(0.1f,0.6f,0.3f,1f),GuiObject.buttonWIDTH, GuiObject.buttonHEIGHT);
+         gameOver = new GuiObject(new Vector2f(-0.6f,0.8f), new Vector4f(0f,0f,0f,1f),GuiObject.buttonWIDTH*2, GuiObject.buttonHEIGHT*3);
+         
+         
+         help = new GuiObject(new Vector2f(-0.3f,0f), new Vector4f(0.1f,0.6f,0.3f,1f),GuiObject.buttonWIDTH, GuiObject.buttonHEIGHT);
          help.setButton(CursorOn.HELP);
          baseMenu.add(help);
          
@@ -187,19 +217,13 @@ public class Game {
      
      
      public void input(Window window, MouseInput mi){
+    	 
     	 cameraInc.set(0,0,0);
     	 forward = 0; strafe = 0;
-    	/* if(window.isKeyPressed(GLFW_KEY_O)){
-    		 state = State.QUIT;
-    	 }*/
     	 
     	 if(window.isKeyPressed(GLFW_KEY_ESCAPE) && state == State.INGAME){
     		state = State.MENU;
     	 }
-    	/* if(window.isKeyPressed(GLFW_KEY_BACKSPACE) && state == State.MENU){
-    		 state = State.INGAME;
-    	 }*/
-    	 
     	 
     	 if(window.isKeyPressed(GLFW_KEY_UP)){
     		 cameraInc.z = -1;
@@ -217,18 +241,17 @@ public class Game {
     		 strafe = 1;
     	 }
     	 
-    	 // JUMP CONTROLS
-    	 if(window.isKeyPressed(GLFW_KEY_G) && earth.onLevelRelativeTo(sun)){ // for earth
-    	    earth.jump();
+          //jump
+    	 if(window.isKeyPressed(GLFW_KEY_E) && earth.onLevelRelativeTo(sun)){
+    		 earth.jump();
     	 }
-    	 
-    	 if(window.isKeyPressed(GLFW_KEY_V) && venus.onLevelRelativeTo(sun) ){  // for venus
-    		venus.jump(); 
-    	 }
-    	 
-    	 if(window.isKeyPressed(GLFW_KEY_M) && moon.onLevelRelativeTo(earth)){   // for moon
+    	 if(window.isKeyPressed(GLFW_KEY_M) && moon.onLevelRelativeTo(earth)){
     		 moon.jump();
     	 }
+    	 if(window.isKeyPressed(GLFW_KEY_V) && venus.onLevelRelativeTo(sun)){
+    		 venus.jump();
+    	 }
+    	 
     	 
      }
      
@@ -245,7 +268,7 @@ public class Game {
     	 cursor.setPosition(mi.getGlPos());
     	 this.cursorCollision();
     	 if(mi.isLeftButtonPressed()){
-    		 onClick();
+    		 changeState();
     	 }
      }
         
@@ -273,11 +296,10 @@ public class Game {
     		 Vector2f rotVec = mi.getDispPos();
     		 camera.moveRotation(rotVec.x * MOUSE_SENSTIVITY, rotVec.y*MOUSE_SENSTIVITY, 0);  
     		 
-    	System.out.println(mi.getGlPos());	
-    		 
-    	earth.update(sun);
-    	venus.update(sun);
-    	moon.update(earth);
+    	earth.update(sun); if(!earth.willRender()){objList.remove(earth);}
+    	venus.update(sun);if(!venus.willRender()){objList.remove(venus);}
+    	moon.update(earth);if(!moon.willRender()){objList.remove(moon);}
+    	
     	
     	if(!cometList.isEmpty())
     	for(int i =0; i<cometList.size(); i++){
@@ -287,8 +309,25 @@ public class Game {
     			cometList.remove(i);    		
     	}
     
+    	if(objList.size() <= 1 && state == State.INGAME){ // only sun
+    		state = State.MENU;
+    		buttonId = CursorOn.GAMEOVER;
+    		changeState();
+    	}
     	
-    	
+    	int curCycles = earth.getCycles() + venus.getCycles() + moon.getCycles();
+    	if(curCycles > netCycles){
+    		netCycles = curCycles;
+    		updateScore(netCycles, this.guiNetNumbers);
+    		
+    	}
+    	int curJumps = earth.getJumps() + venus.getJumps() + moon.getJumps();
+    	//System.out.println(curJumps);
+    	if(curJumps > netJumps){
+    		netJumps = curJumps;
+    		System.out.println(netJumps);
+    		updateScore(netJumps, this.guiNetJumps);		
+    	}
      }
      
      public void render(double dt){
@@ -334,20 +373,45 @@ public class Game {
      }
      
      
+     public void reset(){
+    	 objList.add(earth); earth.reset();
+    	 objList.add(venus); venus.reset();
+    	 objList.add(moon); moon.reset();
+     }
      
-     
+     public void updateScore(int updateTo, GuiNumbers score){
+    	 int number = updateTo;
+    	 int i=1;
+    	 while(number > 0){
+    		 int digit = number%10;
+    		 number = number/10;
+    		 int digitPos = score.getLength() - i;
+    		 score.setAndChange(digit, digitPos);
+    		 i++;
+    	 }
+     }
      
      
      //////////////////////////////  HARD CODED MENU SYSTEM /////////////////////////////
-     public void onClick(){
+     public void changeState(){
     	 if(state == State.MENU){ // do clicky things only in menu state
     		 if(buttonId == CursorOn.RESUME){
     			 state = State.INGAME;
+    			 if(newGame){
+    				 newGame = false;
+    				 baseMenu.remove(newgame);
+    				 baseMenu.add(resume);
+    			 }
     		 }else if(buttonId == CursorOn.QUIT){
     			 state = State.QUIT;
     		 }else if(buttonId == CursorOn.HELP){
     			 currMenu = helpMenu;
     		 }else if(buttonId == CursorOn.BACK){
+    			 currMenu = baseMenu;
+    		 }else if(buttonId == CursorOn.GAMEOVER){
+    			 baseMenu.remove(resume);
+    			 baseMenu.add(gameOver);
+    			 baseMenu.remove(help);
     			 currMenu = baseMenu;
     		 }
     	 }
@@ -366,6 +430,8 @@ public class Game {
     		 }
     	 }
     	 this.renderHighlight = somewhere;
+    	 if(!somewhere)
+    		 this.buttonId = CursorOn.NOWHERE;
      }
      
      public boolean collidedWith(Vector2f cursorPos, GuiObject gui){
@@ -373,6 +439,8 @@ public class Game {
     	 boolean yCollision = (cursorPos.y <= gui.getPosition().y	&& cursorPos.y >= gui.getPosition().y - gui.getHeight() );
     	 return xCollision && yCollision;
      }
+     
+     
      
      
 }

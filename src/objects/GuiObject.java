@@ -47,7 +47,7 @@ public class GuiObject {
 	   fromSpriteSheet = false;
    }
   
-   public GuiObject(Vector2f position, SpriteSheet ss, int row, int col, float width, float height) throws Exception{  // untextured
+   public GuiObject(Vector2f position, SpriteSheet ss, int row, int col, float width, float height) throws Exception{  // textured
 	   this.position = position;
 	   this.width = width;
 	   this.height = height;

@@ -6,6 +6,7 @@ public class GameObject {
     private Vector3f position, rotation, scale;
     private Mesh mesh;
     private boolean dead = false;
+    protected boolean renderMe = true;
     
     public GameObject(Mesh mesh){
     	this.mesh = mesh;
@@ -78,7 +79,11 @@ public class GameObject {
     	return dead;
     }
     
-    public void setDead(){
-    	dead = true;
+    public void setDead(boolean death){
+    	this.dead = death;
+    }
+    
+    public boolean willRender(){
+   	 return renderMe;
     }
 }
