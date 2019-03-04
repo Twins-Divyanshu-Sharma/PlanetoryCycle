@@ -21,6 +21,7 @@ public class Window {
     		System.out.println("unable to initialize glfw");
     	}
     	glfwDefaultWindowHints();
+    	
     	glfwWindowHint(GLFW_VISIBLE,GL_TRUE);
     	glfwWindowHint(GLFW_RESIZABLE,GL_FALSE);
     	
