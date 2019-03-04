@@ -43,6 +43,8 @@ public class MouseInput {
 	  menuMove = menu;
   }
   
+  public int leftOldState = GLFW_RELEASE;
+  
   public void init(Window win){
 	  glfwSetCursorPosCallback(win.getWindowHandle(),cursorPosCallback = new GLFWCursorPosCallback(){
 		 public void invoke(long window, double xPos, double yPos){
@@ -68,8 +70,10 @@ public class MouseInput {
 	  });
 	  glfwSetMouseButtonCallback(win.getWindowHandle(), mouseButtonCallback = new GLFWMouseButtonCallback(){
 		 public void invoke(long window, int button, int action, int mods){
+			 
 			 leftButtonPressed = button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS;
 			 rightButtonPressed = button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS;
+			 
 		 }
 	  });
   }

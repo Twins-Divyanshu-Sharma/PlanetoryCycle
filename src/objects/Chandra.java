@@ -22,6 +22,8 @@ public class Chandra extends GameObject{
 	private int cycles = 0;
 	private int jumps = 0;
 
+	private Path path;
+	
 	
  public Chandra(Mesh mesh, float size, float orbitalRadius, float orbitalW, float phase){
 	 super(mesh);
@@ -161,5 +163,15 @@ public class Chandra extends GameObject{
 	 renderMe = true;
  }
 
+ public void setPath(Path path){
+	 this.path = path;
+ }
+ 
+ public Path getPath(){
+	 return path;
+ }
+ 
+ 
+ 
  
 }

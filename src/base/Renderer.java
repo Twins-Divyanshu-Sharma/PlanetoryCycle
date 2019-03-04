@@ -1,6 +1,18 @@
 package base;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_ALPHA_TEST;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_FILL;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11.GL_GREATER;
+import static org.lwjgl.opengl.GL11.GL_LINE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glAlphaFunc;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glPolygonMode;
 
 import java.util.ArrayList;
 
@@ -10,6 +22,7 @@ import org.joml.Vector3f;
 import objects.Camera;
 import objects.GameObject;
 import objects.GuiObject;
+import objects.Path;
 import objects.PointLight;
 import shader.GuiShader;
 import shader.ShaderProgram;
@@ -25,6 +38,7 @@ public class Renderer {
      
      private ShaderProgram shaderProgram;
      private GuiShader guiShader;
+     private ShaderProgram pathShader;
      
      private float specularPower = 10f;
 
@@ -47,8 +61,21 @@ public class Renderer {
          
          guiShader = new GuiShader();
          guiShader.initialize();
+         
+         initPathShader();
      }
      
+     
+     private void initPathShader() throws Exception {
+    	 pathShader = new ShaderProgram();
+    	 pathShader.createVertexShader(Reader.getCode("pathVertex.vs"));
+    	 pathShader.createFragmentShader(Reader.getCode("pathFragment.fs"));
+    	 pathShader.linkProgram();
+    	 pathShader.createUniform("projectionMatrix");
+    	 pathShader.createUniform("viewMatrix");
+    	 pathShader.createUniform("transformationMatrix");
+    	 pathShader.createUniform("color");
+     }
      
      
      
@@ -74,6 +101,26 @@ public class Renderer {
     	 
     	 shaderProgram.unbind();
      }
+     
+     
+     public void render(double dt, ArrayList<Path> pathList, Camera camera) {
+    	 this.wireframe(true);
+    	 pathShader.bind();
+    	 Matrix4f projectionMatrix = matrixCal.getProjectionMatrix(fov, aspect, zNear, zFar);
+    	 Matrix4f viewMatrix = matrixCal.getViewMatrix(camera);
+		pathShader.setUniform("projectionMatrix", projectionMatrix);
+		pathShader.setUniform("viewMatrix", viewMatrix);
+		for(Path p : pathList) {
+			Matrix4f transformation = matrixCal.getTransformationMatrix(p);
+			pathShader.setUniform("transformationMatrix", transformation);
+			pathShader.setUniform("color", p.getColor());
+			p.render(dt);	
+		}
+		pathShader.unbind();
+		this.wireframe(false);
+		
+     }
+     
      
      public void renderGui(double dt, ArrayList<GuiObject> guiList){
    	    glEnable(GL_BLEND);

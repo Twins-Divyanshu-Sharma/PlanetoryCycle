@@ -9,7 +9,7 @@ public class Greha extends GameObject{
     private static float minA = 0.1f;
     
     private static float dA = 0.001f;
-    
+    private Path path;
     
     // visible fields
 	private float orbitalRadius;   // orbitalRadius from sun to planet
@@ -171,6 +171,14 @@ public class Greha extends GameObject{
 	 this.setDead(false);
 	 this.cycles = 0;
 	 renderMe = true;
+ }
+ 
+ public void setPath(Path path){
+	 this.path = path;
+ }
+ 
+ public Path getPath(){
+	  return path;
  }
  
 

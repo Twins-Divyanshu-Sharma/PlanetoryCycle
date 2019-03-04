@@ -6,10 +6,11 @@ import org.joml.Vector4f;
 import base.CursorOn;
 
 public class GuiObject {
-  public static float buttonWIDTH = 0.5f;	
-  public static float buttonHEIGHT = 0.125f;	
+  public static float buttonWIDTH = 0.30f;	
+  public static float buttonHEIGHT = 0.50f;	
 	
    private Vector2f position;
+   private Vector2f scale  = new Vector2f(1f,1f);
    private float height;
    private float width;
    private boolean textured = false;
@@ -115,5 +116,17 @@ public void setButton(CursorOn buttonId){
 	this.isButton = true;
 }
 
+public void setPosition(float x, float y){
+	position.x = x;
+	position.y = y;
+}
+
+public void setScale(float x, float y){
+	this.scale.x = x;
+	this.scale.y = y;
+}
+public Vector2f getScale(){
+	return scale;
+}
 
 }
