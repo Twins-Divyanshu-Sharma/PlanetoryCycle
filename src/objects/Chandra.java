@@ -13,10 +13,17 @@ public class Chandra extends GameObject{
 	private float jumpSpeed = 0.0025f;  // moon half jump 
 	private float phase = 0f;  // in radians
 	private float orbitalW;
+	private float orbitalA = 0.05f;
 	
 	// not visible fields
 	private float t=0;	
 	private float jumpVelocity = 0;
+	
+	private int cycles = 0;
+	private int jumps = 0;
+
+	private Path path;
+	
 	
  public Chandra(Mesh mesh, float size, float orbitalRadius, float orbitalW, float phase){
 	 super(mesh);
@@ -69,8 +76,16 @@ public class Chandra extends GameObject{
  }
  
  public void update(Greha greha){
-     move(greha);
-     animate();
+	 if(!isDead()){
+		 move(greha);
+		 if(greha.isDead())
+			 this.setDead(true);
+     	 //animate();
+	 }else{
+		 if(jumpVelocity == 0 && renderMe)
+			 jumpVelocity -= jumpSpeed;
+		 animateDeath(greha);
+	 }
  }
  
  private void move(Greha greha){
@@ -95,6 +110,7 @@ public class Chandra extends GameObject{
 	 
 	 if(orbitalW * t > 2*Math.PI){
 		 t = 0;
+		 cycles++;
 	 }
 	 
 	 // set tidal locking
@@ -104,12 +120,26 @@ public class Chandra extends GameObject{
 	 
  }
  
- private void animate(){
+ private void animateDeath(Greha greha){
+	 float y = this.getPosition().y + jumpVelocity;
+	 if(y > greha.getPosition().y){
+		 jumpVelocity += greha.getGravity();
+		 this.setScale(size*squash, size*stretch, size*squash);
+	 }
 	 
+	 if( y < greha.getPosition().y - 15f ){
+		 y = greha.getPosition().y - 15f;
+		 jumpVelocity = 0;
+		 this.setScale(size);
+		 renderMe = false;
+	 }
+	 
+	 this.setPosition(this.getPosition().x, y, this.getPosition().z);
  }
  
  public void jump(){
 	       jumpVelocity = jumpSpeed;
+	       jumps++;
  }
  
  public boolean onLevelRelativeTo(GameObject go){
@@ -118,4 +148,30 @@ public class Chandra extends GameObject{
  }
 
 
+ public int getCycles(){
+	 return cycles;
+ }
+ 
+ public int getJumps(){
+	 return jumps;
+ }
+ 
+ public void reset(){
+	 t=0;
+	 this.setDead(false);
+	 this.cycles = 0;
+	 renderMe = true;
+ }
+
+ public void setPath(Path path){
+	 this.path = path;
+ }
+ 
+ public Path getPath(){
+	 return path;
+ }
+ 
+ 
+ 
+ 
 }

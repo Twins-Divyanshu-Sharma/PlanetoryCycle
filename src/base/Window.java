@@ -1,60 +1,84 @@
 package base;
 
-
+import org.lwjgl.*;
+import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
+import org.lwjgl.system.*;
+
+import java.nio.*;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.system.MemoryStack.*;
 
 
 public class Window {
-	private static int width = 1366;
-	private static int height = 768;
+	public static int width = 1366;
+	public static int height = 768;
 	private static String name = "WateryGame";
 	private long win;
-	private boolean[] keys = new boolean[65536];
 
 	
     public Window(){
+    	
+    	//GLFWErrorCallback.createPrint(System.err).set();
+    	
     	if(!glfwInit()){
-    		System.out.println("unable to initialize glfw");
+    		throw new IllegalStateException("Unable to initialize GLFW");
     	}
     	glfwDefaultWindowHints();
-    	glfwWindowHint(GLFW_VISIBLE,GL_TRUE);
+    	
+    	glfwWindowHint(GLFW_VISIBLE,GL_FALSE);
     	glfwWindowHint(GLFW_RESIZABLE,GL_FALSE);
     	
     	win = glfwCreateWindow(width,height,name,glfwGetPrimaryMonitor(),NULL);
+    	//win = glfwCreateWindow(300,300,name,NULL,NULL);
     	
     	if(win==NULL){
-    		System.out.println("unable to create window");
+    		throw new RuntimeException("Failed to create GLFW ");
     	}
     	
- 	   glfwSetKeyCallback(win, (window,key,scancode,action,mode)->{
-		   if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-			   glfwSetWindowShouldClose(win,true);
-		   keys[key] = action != GLFW_RELEASE;
-	   });
+ 
     
+    	try ( MemoryStack stack = stackPush() ) {
+			IntBuffer pWidth = stack.mallocInt(1); // int*
+			IntBuffer pHeight = stack.mallocInt(1); // int*
+
+			// Get the window size passed to glfwCreateWindow
+			glfwGetWindowSize(win, pWidth, pHeight);
+
+			// Get the resolution of the primary monitor
+			GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+			// Center the window
+			glfwSetWindowPos(
+				win,
+				(vidmode.width() - pWidth.get(0)) / 2,
+				(vidmode.height() - pHeight.get(0)) / 2
+			);
+		} 
     	
+    	
+ 	
     	glfwMakeContextCurrent(win);
     	
-    	glfwSwapInterval(1);  // v-sync
+
     	
-    	glfwShowWindow(win);
+    	glfwSwapInterval(1);  // v-sync
+      	glfwShowWindow(win);
     	
         GL.createCapabilities();
         
-        glClearColor(0.2f,0.2f,0.2f,1f);
+        glClearColor(0.01f,0.01f,0.01f,1f);
         
-        glEnable(GL_DEPTH_TEST);
+  	  glEnable(GL_DEPTH_TEST);
+      
+      glEnable(GL_ALPHA_TEST);
+      glAlphaFunc(GL_GREATER,0.1f);
         
-        glEnable(GL_ALPHA_TEST);
-        glAlphaFunc(GL_GREATER,0.1f);
-        
-        System.out.println(glGetString(GL_VERSION));
-    	
+
     }
     
     public void swapBuffers(){
@@ -63,6 +87,10 @@ public class Window {
     
     public void poll(){
  	   glfwPollEvents();
+    }
+    
+    public void setClearColor(float r, float g, float b){
+    	glClearColor(r,g,b,1f);
     }
     
     public void clear(){
@@ -75,10 +103,12 @@ public class Window {
     }
     
     public void shutdown(){
- 	   glfwFreeCallbacks(win);
+   	 // glfwSetErrorCallback(null).free();
+ 	  // glfwFreeCallbacks(win);
  	   glfwDestroyWindow(win);
  	   
  	   glfwTerminate();
+
     }
     
     public float getAspectRatio(){
@@ -86,11 +116,21 @@ public class Window {
     }
     
     public boolean isKeyPressed(int key){
-    	return keys[key];
+    	int state = glfwGetKey(win, key);
+    	return (state != GLFW_RELEASE);
     }
+    
+    public boolean isKeyTyped(int key){
+    	int state = glfwGetKey(win, key);
+    	return (state == GLFW_REPEAT);
+    }
+    
     public long getWindowHandle(){
     	return win;
     }
     
+    public void close(){
+    	glfwSetWindowShouldClose(win,true);
+    }
 
 }

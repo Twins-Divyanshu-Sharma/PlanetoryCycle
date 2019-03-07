@@ -14,6 +14,7 @@ public class Engine implements Runnable{
 	
 	private Thread thread;
 	
+	
 	public void init(){
 		thread = new Thread(this);
 		thread.start();
@@ -89,7 +90,8 @@ public class Engine implements Runnable{
    	            }
    	     render(lag/msPerFrame);
    	     
-   	     if(window.isCloseRequested()){
+   	     if(game.shouldQuit()){
+   	    	 window.close();
    	    	 runing = false;
    	     }
      }

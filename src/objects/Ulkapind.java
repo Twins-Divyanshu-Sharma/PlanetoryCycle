@@ -8,11 +8,10 @@ import base.Game;
 
 public class Ulkapind extends GameObject{
 	
+	private Vector3f tangent;
 	private Vector3f focus1;
-	private Vector3f focus2;
 	
 	private Vector3f centre;
-	private Vector3f bigF;
 	
 	float radius;
 	
@@ -22,43 +21,50 @@ public class Ulkapind extends GameObject{
 	private float t;
 	private float w;
 	
-	private float a = 0.3f, b = 0.5f;
+	private float shift;
+	
+	private float a = 5f, b = 5f;
+	
+	private Path path;
 	
 	public Ulkapind(Mesh mesh, float size, Vector3f focus, int distance, float tiltAngle, float w){
 		super(mesh);
-		
+		distance = distance/2;
+		renderMe = true;
+		this.setDead(false);
 		this.tiltAngle = (float)Math.toRadians(tiltAngle);
 		this.w = w;
 		this.setScale(size);
 		radius = size;
 		
 		focus1 = focus;
-		System.out.println(focus1.x+" "+focus1.z);
+		float cx = focus.x + (float)(distance*Math.cos(tiltAngle));
+		float cz = focus.z + (float)(distance*Math.sin(tiltAngle));
 		
-		float fx = focus.x + (float)(distance*Math.cos(tiltAngle));
-		float fz = focus.z + (float)(distance*Math.sin(tiltAngle));
-		
-		focus2 = new Vector3f(fx, focus.y, fz);
-		System.out.println(focus2.x+" "+focus2.z);
-	
-		bigF = focus1.x > focus2.x ? focus1 : focus2;
-		
-		float cx = (focus1.x + focus2.x) / 2;
-		float cz = (focus1.z + focus2.z) / 2;
 		centre = new Vector3f(cx, focus.y, cz);
 		
-		float db = (bigF.x - centre.x)*(bigF.x - centre.x) + (bigF.z - centre.z)*(bigF.z - centre.z);
-		db = (float)Math.sqrt(db);
-		b += db;
+		b += distance;
+		
+		shift = distance;
 	}
 	
 		
-	public void update(){
+	public void update(ArrayList<GameObject> list){
+		if(!this.isDead()){
+			move(list);
+		}else{
+				animateDeath();
+		}
+
 		
-		t += dt;
+	}
+	
+	
+	public void move(ArrayList<GameObject> list){
+		t += dt;		
 		
-		double x = ( b*Math.cos(tiltAngle) - a*Math.sin(tiltAngle) ) * Math.cos(w*t + dt) + centre.x;
-		double z = ( b* Math.sin(tiltAngle)+ a*Math.cos(tiltAngle)) * Math.sin(w*t + dt) + centre.y;
+		double x = ( b * Math.cos(w*t + dt) + shift ) * Math.cos(tiltAngle)   -   a * Math.sin(w*t + dt) * Math.sin(tiltAngle) ;
+		double z = ( b * Math.cos(w*t + dt) + shift) * Math.sin(tiltAngle)  +  a * Math.sin(w*t + dt) * Math.cos(tiltAngle);
 		
 		this.setPosition((float)x, this.getPosition().y, (float)z);
 		
@@ -66,7 +72,9 @@ public class Ulkapind extends GameObject{
 			 t = 0;
 		 }
 		
+		theCollision(list);
 	}
+	
 	
 	public boolean theCollision(ArrayList<GameObject> list){
 		
@@ -79,7 +87,10 @@ public class Ulkapind extends GameObject{
 			//double dist = (i.getPosition().x - this.getPosition().x)*(i.getPosition().x - this.getPosition().x) + (i.getPosition().y - this.getPosition().y)*(i.getPosition().y - this.getPosition().y);
 			double dist = i.getPosition().distance(this.getPosition());
 			if(dist < r + radius){
-				System.out.println("collided with "+j);
+				//System.out.println("collided with "+j);
+				this.setDead(true);
+				renderMe = false;
+				i.setDead(true);
 				return true;
 			}
 		}
@@ -87,5 +98,50 @@ public class Ulkapind extends GameObject{
 		return false;
 	}
 	
+	public float geta() {
+		return a;
+	}
 	
+	public float getb() {
+		return b;
+	}
+	
+	public float getAngle() {
+		return tiltAngle;
+	}
+	
+	public Vector3f getCentre() {
+		return centre;
+	}
+	
+	public float getShift() {
+		return shift;
+	}
+	
+	public void setPath(Path path){
+		this.path = path;
+	}
+	
+	public Path getPath(){
+		return path;
+	}
+	
+	public void animateDeath(){
+		//this.setPosition(this.getPosition().x + 0.001f, this.getPosition().y+0.001f, this.getPosition().z+0.001f);
+		this.setPosition(this.getPosition().x + this.tangent.x*0.001f, this.getPosition().y, this.getPosition().z+this.tangent.z*0.001f);
+		if(this.getPosition().distance(focus1) > 50f){
+			renderMe = false;
+		}
+	}
+	public void setTangent(){
+		//tangent = new Vector3f();
+		t -= 2*dt;		
+		tangent = new Vector3f();
+		double x = ( b * Math.cos(w*t + dt) + shift ) * Math.cos(tiltAngle)   -   a * Math.sin(w*t + dt) * Math.sin(tiltAngle) ;
+		double z = ( b * Math.cos(w*t + dt) + shift) * Math.sin(tiltAngle)  +  a * Math.sin(w*t + dt) * Math.cos(tiltAngle);
+		Vector3f prev = new Vector3f((float)x,this.getPosition().y,(float)z);
+		this.getPosition().sub(prev, tangent);
+		tangent.normalize();
+	}
+
 }

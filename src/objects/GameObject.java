@@ -5,7 +5,8 @@ import org.joml.Vector3f;
 public class GameObject {
     private Vector3f position, rotation, scale;
     private Mesh mesh;
-
+    private boolean dead = false;
+    protected boolean renderMe = true;
     
     public GameObject(Mesh mesh){
     	this.mesh = mesh;
@@ -72,5 +73,17 @@ public class GameObject {
     
     public Mesh getMesh(){
     	return mesh;
+    }
+    
+    public boolean isDead(){
+    	return dead;
+    }
+    
+    public void setDead(boolean death){
+    	this.dead = death;
+    }
+    
+    public boolean willRender(){
+   	 return renderMe;
     }
 }

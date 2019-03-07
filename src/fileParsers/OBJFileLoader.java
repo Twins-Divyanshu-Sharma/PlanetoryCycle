@@ -17,7 +17,7 @@ import objects.Mesh;
  
 public class OBJFileLoader {
      
-    private static final String RES_LOC = "resourse/";
+    private static final String RES_LOC = "res/models/";
  
     public static Mesh loadMesh(String objFileName) {
         FileReader isr = null;
