@@ -12,6 +12,7 @@ import org.lwjgl.system.MemoryStack;
 
 import objects.Material;
 import objects.PointLight;
+import utility.Reader;
 
 
 public class ShaderProgram {
@@ -21,6 +22,7 @@ public class ShaderProgram {
     protected Map<String, Integer> uniforms;
     
     public ShaderProgram() throws Exception{
+    
         uniforms = new HashMap<>();
     	programID = glCreateProgram();
     	if(programID == 0){

@@ -9,10 +9,10 @@ public class GuiShader extends ShaderProgram {
 	private static String vs = "gui.vs";
 	private static String fs = "gui.fs";
 	
-	public GuiShader() throws Exception{
+	public GuiShader(Reader reader) throws Exception{
 		super();
-   	 createVertexShader(Reader.getCode(vs));
-   	 createFragmentShader(Reader.getCode(fs));
+   	 createVertexShader(reader.getCodeString(vs));
+   	 createFragmentShader(reader.getCodeString(fs));
    	 linkProgram();
 	}
     

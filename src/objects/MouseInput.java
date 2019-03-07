@@ -6,14 +6,19 @@ import org.lwjgl.glfw.GLFWCursorEnterCallback;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.glfw.GLFWMouseButtonCallback;
+import org.lwjgl.system.MemoryStack;
+
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.stb.STBImage.stbi_failure_reason;
+import static org.lwjgl.stb.STBImage.stbi_load;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 
 import base.Window;
-import de.matthiasmann.twl.utils.PNGDecoder;
+
 
 public class MouseInput {
   private Vector2d prevPos;
@@ -79,7 +84,7 @@ public class MouseInput {
   }
   
   public void setCursor(Window w,String s) throws Exception{
-		
+		/*
 		FileInputStream i;
 		PNGDecoder decoder;
 
@@ -89,15 +94,41 @@ public class MouseInput {
 		ByteBuffer buff = ByteBuffer.allocateDirect( 4 * decoder.getHeight() * decoder.getWidth());
 		decoder.decode(buff, decoder.getWidth()*4, PNGDecoder.Format.RGBA);
 		buff.flip();
-		
+		*/
+	  int width=0, height=0;
+	  
+	  ByteBuffer image;
+
+      try (MemoryStack stack = MemoryStack.stackPush()) {
+          /* Prepare image buffers */
+          IntBuffer wi = stack.mallocInt(1);
+          IntBuffer he = stack.mallocInt(1);
+          IntBuffer comp = stack.mallocInt(1);
+
+          /* Load image */
+          //stbi_set_flip_vertically_on_load(true);
+          image = stbi_load("res/textures/"+s, wi, he, comp, 4);
+          
+          if (image == null) {
+              throw new RuntimeException("Failed to load a texture file!"
+                                         + System.lineSeparator() + stbi_failure_reason());
+          }
+
+          /* Get width and height of image */
+          width = wi.get();
+          height = he.get();
+      }
+	  
+	  
+	  
 	    GLFWImage cursorImg= GLFWImage.create();
-	    cursorImg.width(decoder.getWidth());     // setup the images' width
-	    cursorImg.height(decoder.getHeight());   // setup the images' height
-	    cursorImg.pixels(buff);   // pass image data
+	    cursorImg.width(width);     // setup the images' width
+	    cursorImg.height(height);   // setup the images' height
+	    cursorImg.pixels(image);   // pass image data
 
 	    // create custom cursor and store its ID
-	    int hotspotX = decoder.getWidth()/2;
-	    int hotspotY = decoder.getHeight()/2;
+	    int hotspotX = 0;
+	    int hotspotY = 0;
 	    long cursorID = glfwCreateCursor(cursorImg, hotspotX , hotspotY);
 
 	    // set current cursor

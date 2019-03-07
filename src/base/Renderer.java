@@ -41,13 +41,16 @@ public class Renderer {
      private ShaderProgram pathShader;
      
      private float specularPower = 10f;
+     
+     private Reader reader;
 
     
      public Renderer(float aspect) throws Exception{
+    	 reader = new Reader();
     	 this.aspect = aspect;
     	 shaderProgram = new ShaderProgram();
-    	 shaderProgram.createVertexShader(Reader.getCode("vertex.vs"));
-    	 shaderProgram.createFragmentShader(Reader.getCode("fragment.fs"));
+    	 shaderProgram.createVertexShader(reader.getCodeString("vertex.vs"));
+    	 shaderProgram.createFragmentShader(reader.getCodeString("fragment.fs"));
     	 shaderProgram.linkProgram();
     	 shaderProgram.createUniform("projectionMatrix");
     	 shaderProgram.createUniform("viewMatrix");
@@ -59,7 +62,7 @@ public class Renderer {
          shaderProgram.createUniform("ambientLight");
          shaderProgram.createPointLightUniform("pointLight");    
          
-         guiShader = new GuiShader();
+         guiShader = new GuiShader(reader);
          guiShader.initialize();
          
          initPathShader();
@@ -68,8 +71,8 @@ public class Renderer {
      
      private void initPathShader() throws Exception {
     	 pathShader = new ShaderProgram();
-    	 pathShader.createVertexShader(Reader.getCode("pathVertex.vs"));
-    	 pathShader.createFragmentShader(Reader.getCode("pathFragment.fs"));
+    	 pathShader.createVertexShader(reader.getCodeString("pathVertex.vs"));
+    	 pathShader.createFragmentShader(reader.getCodeString("pathFragment.fs"));
     	 pathShader.linkProgram();
     	 pathShader.createUniform("projectionMatrix");
     	 pathShader.createUniform("viewMatrix");
