@@ -4,7 +4,7 @@ import objects.MouseInput;
 
 public class Engine implements Runnable{
 
-	private double fps = 60.0;
+	private double fps = 60.0 ;
 	private double msPerFrame = 10/fps;
 	
 	private boolean runing = false;
