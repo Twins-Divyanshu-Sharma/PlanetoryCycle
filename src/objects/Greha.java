@@ -5,7 +5,12 @@ public class Greha extends GameObject{
 	private static float dt = 0.0001f;
 	private static float squash = 0.8f;
     private static float stretch = 1.025f;
-	
+    private static float maxA = 0.2f;
+    private static float minA = 0.1f;
+    
+    private static float dA = 0.001f;
+    private Path path;
+    
     // visible fields
 	private float orbitalRadius;   // orbitalRadius from sun to planet
 	private float size;
@@ -14,9 +19,15 @@ public class Greha extends GameObject{
 	private float orbitalW;
 	private float gravity = -0.000002f;
 	
+	private float orbitalA = 0.01f; //orbital alpha
+	
 	// not visible fields
 	private float t=0;	
 	private float jumpVelocity = 0;
+	
+	private int cycles = 0;
+	private int jumps = 0;
+	
 	
  public Greha(Mesh mesh, float size, float orbitalRadius, float orbitalW, float phase){
 	 super(mesh);
@@ -79,32 +90,38 @@ public class Greha extends GameObject{
  }
  
  public void update(Surya surya){
-     move(surya);
-     animate();
+	 if(!isDead()){
+		 move(surya);
+     	//animate();
+	 }else{
+		 if(jumpVelocity == 0 && renderMe)
+			jumpVelocity -= jumpSpeed;
+		 animateDeath(surya);
+	 }
  }
  
  private void move(Surya surya){
 	 t += dt;
-	
-	 float x = surya.getPosition().x + (float)(orbitalRadius * Math.cos(orbitalW * t + phase)); 
+	 float orbitalAngle = phase + orbitalW*t;
+	 float x = surya.getPosition().x + (float)(orbitalRadius * Math.cos(orbitalAngle)); 
 	 float y = this.getPosition().y + jumpVelocity;
-	 float z = surya.getPosition().z + (float)(orbitalRadius * Math.sin(orbitalW * t + phase));
+	 float z = surya.getPosition().z + (float)(orbitalRadius * Math.sin(orbitalAngle));
 	 
-	 if(y > surya.getPosition().y){
-		 jumpVelocity += surya.getGravity();
-		 this.setScale(size*squash, size*stretch, size*squash);
-	 }
-	 
-	 if( y < surya.getPosition().y ){
-		 y = surya.getPosition().y;
-		 jumpVelocity = 0;
-		 this.setScale(size);
-	 }
+     if(y > surya.getPosition().y){
+    	 jumpVelocity += surya.getGravity();
+    	 this.setScale(size*squash, size*stretch,size*squash);
+     }
+     if(y < surya.getPosition().y){
+    	 y = surya.getPosition().y;
+    	 jumpVelocity = 0;
+    	 this.setScale(size);
+     }
 	 
 	 this.setPosition(x, y, z);
 	 
-	 if(orbitalW * t > 2*Math.PI){
+	if(orbitalW*t > 2*Math.PI){
 		 t = 0;
+		 cycles++;
 	 }
 	 
 	 // set tidal locking
@@ -114,18 +131,57 @@ public class Greha extends GameObject{
 	 
  }
  
- private void animate(){
+ private void animateDeath(Surya surya){
+	 float y = this.getPosition().y + jumpVelocity;
+	 if(y > surya.getPosition().y){
+		 jumpVelocity += surya.getGravity();
+		 this.setScale(size*squash, size*stretch, size*squash);
+	 }
 	 
+	 if( y < surya.getPosition().y - 15f ){
+		 y = surya.getPosition().y - 15f;
+		 jumpVelocity = 0;
+		 this.setScale(size);
+		 renderMe = false;
+	 }
+	 this.setPosition(this.getPosition().x, y, this.getPosition().z);
  }
+ 
  
  public void jump(){
 	       jumpVelocity = jumpSpeed;
+	       jumps++;
  }
  
  public boolean onLevelRelativeTo(GameObject go){
 	return this.getPosition().y == go.getPosition().y ? true : false;
 	 
  }
+
+ public int getCycles(){
+	 return cycles;
+ }
+ 
+ public int getJumps(){
+	 return jumps;
+ }
+ 
+ public void reset(){
+	 t=0;
+	 this.setDead(false);
+	 this.cycles = 0;
+	 renderMe = true;
+ }
+ 
+ public void setPath(Path path){
+	 this.path = path;
+ }
+ 
+ public Path getPath(){
+	  return path;
+ }
+ 
+
 
  
 }
