@@ -86,6 +86,7 @@ public class Game {
      private Greha venus;
      private Surya sun;
      private GameObject keiperBelt;
+     private GameObject keiperBelt2;
      private GroupOfComet cometGroup;
      
 
@@ -174,15 +175,20 @@ public class Game {
     	 objList.add(sun);
     	 
          //Keiper Belt
-         Mesh keiperBeltMesh = OBJFileLoader.loadMesh("mm.obj");
-         Texture keiperTexture = new Texture("metiorAO2.png");
+         Mesh keiperBeltMesh = OBJFileLoader.loadMesh("KB.obj");
+         Texture keiperTexture = new Texture("kb2.png");
          Material matKeiper = new Material(keiperTexture,reflectance);
          keiperBeltMesh.setMaterial(matKeiper);
          this.keiperBelt = new GameObject(keiperBeltMesh);
          keiperBelt.setPosition(sun.getPosition().x, sun.getPosition().y, sun.getPosition().z);
-         keiperBelt.setScale(3f,3f,3f);
+         keiperBelt.setScale(2f,2f,2f);
          objList.add(keiperBelt);
     	
+         keiperBelt2 = new GameObject(keiperBeltMesh);
+         keiperBelt2.setPosition(sun.getPosition().x, sun.getPosition().y, sun.getPosition().z);
+         keiperBelt2.setScale(8f, 8f, 8f);
+         keiperBelt2.setRotation(0,0,90);
+         objList.add(keiperBelt2);
     		
     	 Path earthOrbit = new Path(sun, earth.getOrbitalRadius(), 50);
     	 earth.setPath(earthOrbit);
@@ -368,6 +374,12 @@ public class Game {
     	keiperBelt.setRotation(0, roty , 0);
     	if(keiperBelt.getRotation().y > 360)
     		keiperBelt.setRotation(0, 0, 0);
+    	
+    	float rotx = keiperBelt2.getRotation().x + 0.001f;
+    	keiperBelt2.getRotation().x = rotx;
+    	keiperBelt2.setRotation(rotx, 0 , 90);
+    	if(keiperBelt2.getRotation().y > 360)
+    		keiperBelt2.setRotation(0, 0, 90);
     	
     	cometGroup.update(this.cometList,this.pathList,this.objList);
     	
