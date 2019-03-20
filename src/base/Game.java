@@ -169,20 +169,20 @@ public class Game {
     	 matSun.setAmbientColor(new Vector4f(1,1,1,1));
     	 matSun.setEmission(true);
     	 sunMesh.setMaterial(matSun);
-    	 sun = new Surya(sunMesh,new Vector3f(0,0,0), new Vector3f(1,1,1), 20f); //sunMesh, position, lightcolour, lightintensity
+    	 sun = new Surya(sunMesh,new Vector3f(0,0,0), new Vector3f(1,1,1), 30f); //sunMesh, position, lightcolour, lightintensity
     	 sun.setScale(2f);
     	 objList.add(sun);
     	 
          //Keiper Belt
-         Mesh keiperBeltMesh = OBJFileLoader.loadMesh("KeiperBelt.obj");
-         Texture keiperTexture = new Texture("KeiperBelt.png");
+         Mesh keiperBeltMesh = OBJFileLoader.loadMesh("mm.obj");
+         Texture keiperTexture = new Texture("metiorAO2.png");
          Material matKeiper = new Material(keiperTexture,reflectance);
          keiperBeltMesh.setMaterial(matKeiper);
          this.keiperBelt = new GameObject(keiperBeltMesh);
          keiperBelt.setPosition(sun.getPosition().x, sun.getPosition().y, sun.getPosition().z);
-         keiperBelt.setScale(2f,2f,2f);
+         keiperBelt.setScale(3f,3f,3f);
          objList.add(keiperBelt);
-    	 
+    	
     		
     	 Path earthOrbit = new Path(sun, earth.getOrbitalRadius(), 50);
     	 earth.setPath(earthOrbit);
