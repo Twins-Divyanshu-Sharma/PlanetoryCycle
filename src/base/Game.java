@@ -407,13 +407,12 @@ public class Game {
      }
      
      public void renderMenu(double dt){
-    	 // decreasing order ... I know its weird
-    	 renderer.renderSingleGui(dt,cursor);
+    	 renderer.renderSingleGui(dt, bg);
+    	 renderer.renderGui(dt,currMenu);
     	 if(this.renderHighlight)
     		 renderer.renderSingleGui(dt, buttonHighlight);
-    	 renderer.renderGui(dt,this.currMenu);
-    	 renderer.renderSingleGui(dt, bg);
-     }
+    	 renderer.renderSingleGui(dt,cursor);
+    }
      
      public void cleanUp(){
 

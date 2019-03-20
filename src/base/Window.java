@@ -28,8 +28,9 @@ public class Window {
     	if(!glfwInit()){
     		throw new IllegalStateException("Unable to initialize GLFW");
     	}
-    	glfwDefaultWindowHints();
     	
+    	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     	glfwWindowHint(GLFW_VISIBLE,GL_FALSE);
     	glfwWindowHint(GLFW_RESIZABLE,GL_FALSE);
     	
@@ -74,11 +75,8 @@ public class Window {
         glClearColor(0.01f,0.01f,0.01f,1f);
         
   	  glEnable(GL_DEPTH_TEST);
-      
-      glEnable(GL_ALPHA_TEST);
-      glAlphaFunc(GL_GREATER,0.1f);
-        
-
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     }
     
     public void swapBuffers(){

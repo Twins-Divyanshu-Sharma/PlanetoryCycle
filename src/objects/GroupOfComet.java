@@ -25,7 +25,7 @@ public class GroupOfComet {
 	int currentMembers;
 	
 	
-	private float maxUlkaSize = 0.8f; private float minUlkaSize = 0.2f;
+	private float maxUlkaSize = 0.5f; private float minUlkaSize = 0.2f;
 	private int maxDistance = 15; private int minDistance = 7;
 	private float maxAngle = 360f;
 	private float maxW = 2f; private float minW = 0.5f;

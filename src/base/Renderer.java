@@ -1,18 +1,6 @@
 package base;
 
-import static org.lwjgl.opengl.GL11.GL_ALPHA_TEST;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_FILL;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_GREATER;
-import static org.lwjgl.opengl.GL11.GL_LINE;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glAlphaFunc;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPolygonMode;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.util.ArrayList;
 
@@ -126,9 +114,7 @@ public class Renderer {
      
      
      public void renderGui(double dt, ArrayList<GuiObject> guiList){
-   	    glEnable(GL_BLEND);
-   	    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    	 
+    	glDisable(GL_DEPTH_TEST);
     	guiShader.bind();
     	 guiShader.setUniform("sampler", 0);
     	 for(GuiObject gui : guiList){
@@ -141,17 +127,12 @@ public class Renderer {
 
     	 
     	 guiShader.unbind();
-          
-    	 glDisable(GL_BLEND);
-         glEnable(GL_ALPHA_TEST);
-         glAlphaFunc(GL_GREATER,0.1f);
-    
+        glEnable(GL_DEPTH_TEST);
     }
      // single gui
      public void renderSingleGui(double dt, GuiObject gui){
-    	    glEnable(GL_BLEND);
-    	    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-     	 
+    	glDisable(GL_DEPTH_TEST);
+    	 
      	guiShader.bind();
      	 guiShader.setUniform("sampler", 0);
      		  Matrix4f transformationMatrix = matrixCal.getTransformationMatrix(gui);
@@ -162,10 +143,7 @@ public class Renderer {
 	 
      	 guiShader.unbind();
            
-     	 glDisable(GL_BLEND);
-          glEnable(GL_ALPHA_TEST);
-          glAlphaFunc(GL_GREATER,0.1f);
-     
+       glEnable(GL_DEPTH_TEST);
      }
      
      

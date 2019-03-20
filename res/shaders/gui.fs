@@ -1,4 +1,4 @@
-#version 400
+#version 330
 
 out vec4 fragColor;
 in vec2 outTexCoord;
@@ -19,6 +19,9 @@ void main()
    {
       baseColor = color;
    }
+   
+   if(baseColor.a < 0.1f)
+   		discard;
    
    fragColor = baseColor;
 }
