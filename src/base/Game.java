@@ -369,6 +369,9 @@ public class Game {
     	venus.update(sun);if(venus.isDead()){pathList.remove(venus.getPath());}if(!venus.willRender()){objList.remove(venus);}
     	moon.update(earth);if(moon.isDead()){pathList.remove(moon.getPath());}if(!moon.willRender()){objList.remove(moon);}
     	
+    	
+    	
+    	
     	float roty = keiperBelt.getRotation().y + 0.001f;
     	keiperBelt.getRotation().y = roty;
     	keiperBelt.setRotation(0, roty , 0);
@@ -384,7 +387,7 @@ public class Game {
     	cometGroup.update(this.cometList,this.pathList,this.objList);
     	
 
-    	if(objList.size() <= this.minObjects && state == State.INGAME){ // only sun and belt
+    	if(earth.isDead() &&  venus.isDead() && state == State.INGAME){ // only sun and belt
     		state = State.MENU;
     		buttonId = CursorOn.GAMEOVER;
     		changeState();
@@ -401,6 +404,8 @@ public class Game {
     		netJumps = curJumps;
     		updateScore(netJumps, this.guiNetJumps);		
     	}
+    	
+
      }
      
      public void render(double dt){
