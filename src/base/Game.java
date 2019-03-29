@@ -1,13 +1,11 @@
 package base;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_Q;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
+
+import static org.lwjgl.opengl.GL11.*;
 
 import java.util.ArrayList;
 
@@ -31,7 +29,6 @@ import objects.Player;
 import objects.SpriteSheet;
 import objects.Surya;
 import objects.Texture;
-import objects.Ulkapind;
 
 
 
@@ -65,8 +62,10 @@ public class Game {
      private ArrayList<GameObject> objList = new ArrayList<GameObject>();
      private ArrayList<GameObject> objList2 = new ArrayList<GameObject>();
      private ArrayList<GameObject> cometList = new ArrayList<GameObject>();
+     private ArrayList<GameObject> shiny = new ArrayList<GameObject>();
      
      private ArrayList<GuiObject> hudList = new ArrayList<GuiObject>();
+     
      
      
      
@@ -85,6 +84,7 @@ public class Game {
      private Chandra moon;
      private Greha venus;
      private Surya sun;
+     private GameObject shineBB;
      private GameObject keiperBelt;
      private GameObject keiperBelt2;
      private GroupOfComet cometGroup;
@@ -98,6 +98,7 @@ public class Game {
      private Mesh ulkaMesh;
      
      private ArrayList<Path> pathList = new ArrayList<Path>();
+     
      
      private Vector3f menuBG = new Vector3f(0.1f,0.1f,0.1f);
 
@@ -175,6 +176,16 @@ public class Game {
     	 sun = new Surya(sunMesh,new Vector3f(0,0,0), new Vector3f(1,1,1), 30f); //sunMesh, position, lightcolour, lightintensity
     	 sun.setScale(2f);
     	 objList.add(sun);
+    	 
+    	 Mesh shine = OBJFileLoader.loadMesh("plane.obj");
+    	 Texture texShine = new Texture("shineBB.png");
+    	 Material shinemat = new Material(texShine,reflectance);
+    	 shine.setMaterial(shinemat);
+    	 shineBB = new GameObject(shine);
+    	 shineBB.setPosition(sun.getPosition().x+0.14f, sun.getPosition().y + 0.1f, sun.getPosition().z);
+    	 shineBB.setRotation(-11,0,0);
+    	 shineBB.setScale(2.15f);
+    	 shiny.add(shineBB);
     	 
          //Keiper Belt
          Mesh keiperBeltMesh = OBJFileLoader.loadMesh("KB.obj");
@@ -312,6 +323,8 @@ public class Game {
     	 if(window.isKeyPressed(GLFW_KEY_ESCAPE) && state == State.INGAME){
     		state = State.MENU;
     	 }
+    	
+    	 
     	/* 
     	 if(window.isKeyPressed(GLFW_KEY_UP)){
     		 cameraInc.z = -1;
@@ -375,7 +388,7 @@ public class Game {
     	moon.update(earth);if(moon.isDead()){pathList.remove(moon.getPath());}if(!moon.willRender()){objList.remove(moon);}
     	
     	
-    	
+    //	shineBB.setRotation(-camera.getRotation().x, camera.getRotation().y, camera.getRotation().z);
     	
     	float roty = keiperBelt.getRotation().y + 0.001f;
     	keiperBelt.getRotation().y = roty;
@@ -426,6 +439,9 @@ public class Game {
          renderer.render(dt, objList, camera, ambientLight, sun.getLight());
          renderer.render(dt, cometList, camera, ambientLight, sun.getLight());
          renderer.renderGui(dt, hudList);
+         glDisable(GL_DEPTH_TEST);
+         renderer.render(dt, shiny, camera, ambientLight, sun.getLight());
+         glEnable(GL_DEPTH_TEST);
      }
      
      public void renderMenu(double dt){
