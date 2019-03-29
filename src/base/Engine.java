@@ -4,7 +4,7 @@ import objects.MouseInput;
 
 public class Engine implements Runnable{
 
-	private double fps = 60.0;
+	private double fps = 60.0 ;
 	private double msPerFrame = 10/fps;
 	
 	private boolean runing = false;
@@ -13,6 +13,7 @@ public class Engine implements Runnable{
 	private MouseInput mouseInput;
 	
 	private Thread thread;
+	
 	
 	public void init(){
 		thread = new Thread(this);
@@ -89,7 +90,8 @@ public class Engine implements Runnable{
    	            }
    	     render(lag/msPerFrame);
    	     
-   	     if(window.isCloseRequested()){
+   	     if(game.shouldQuit()){
+   	    	 window.close();
    	    	 runing = false;
    	     }
      }
