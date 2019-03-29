@@ -117,6 +117,8 @@ public class Game {
      private GuiObject gameOver;
      private GuiObject credits;
      private GuiObject meteor;
+     private GuiObject retry;
+     private GuiObject quit;
      
      public Game(Window window){
     	 this.window = window;
@@ -269,9 +271,12 @@ public class Game {
          credits.setButton(CursorOn.CREDITS);
          baseMenu.add(credits);
          
-         GuiObject quit = new GuiObject(new Vector2f(-0.9f,0.9f), buttonSprites, 1, 0,GuiObject.buttonWIDTH, GuiObject.buttonHEIGHT);
+         quit = new GuiObject(new Vector2f(-0.9f,0.9f), buttonSprites, 1, 0,GuiObject.buttonWIDTH, GuiObject.buttonHEIGHT);
          quit.setButton(CursorOn.QUIT);
          baseMenu.add(quit);
+         
+        retry = new GuiObject(new Vector2f(-0.8f,-0.6f),"Retry.png", GuiObject.buttonWIDTH, GuiObject.buttonHEIGHT);
+        retry.setButton(CursorOn.RETRY);
          
          // help Menu
          GuiObject back = new GuiObject(new Vector2f(0.5f,0.9f), buttonSprites, 2, 1,GuiObject.buttonWIDTH/2, GuiObject.buttonHEIGHT/2);
@@ -458,6 +463,18 @@ public class Game {
     	 objList.add(earth); earth.reset();
     	 objList.add(venus); venus.reset();
     	 objList.add(moon); moon.reset();
+    	 pathList.clear();
+    	 pathList.add(earth.getPath());
+    	 pathList.add(moon.getPath());
+    	 pathList.add(venus.getPath());
+    	 
+ 		netJumps = 0;
+ 		updateScore(netJumps, this.guiNetJumps);
+ 		
+ 		netCycles = 0;
+ 		updateScore(netCycles,this.guiNetJumps);
+ 		
+ 		updateScore(0,this.guiNetNumbers);
      }
      
      public void updateScore(int updateTo, GuiNumbers score){
@@ -493,6 +510,7 @@ public class Game {
     			 baseMenu.remove(resume);
     			 createAndAddFinalScore(baseMenu);
     			 baseMenu.add(gameOver);
+    			 baseMenu.add(retry);
     			 baseMenu.remove(help);
     			 baseMenu.remove(meteor);
     			 baseMenu.remove(credits);
@@ -501,6 +519,18 @@ public class Game {
     			 currMenu = creditsMenu;
     		 }else if(buttonId == CursorOn.CREDITSBACK){
     			 currMenu = baseMenu;
+    		 }else if(buttonId == CursorOn.RETRY){
+    			 baseMenu.clear();
+    			 baseMenu.add(resume);
+    			 baseMenu.add(credits);
+    			 baseMenu.add(help);
+    			 baseMenu.add(meteor);
+    			 baseMenu.add(quit);
+    			 currMenu = baseMenu;
+    			 newGame = false;
+    			 reset();
+    			 
+    			 state = State.INGAME;
     		 }
     	 }
      }
@@ -538,6 +568,7 @@ public class Game {
          }
      }
      
+
      
      
 }
