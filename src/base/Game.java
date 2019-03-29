@@ -469,12 +469,12 @@ public class Game {
     	 pathList.add(venus.getPath());
     	 
  		netJumps = 0;
- 		updateScore(netJumps, this.guiNetJumps);
- 		
  		netCycles = 0;
- 		updateScore(netCycles,this.guiNetJumps);
+ 		for(int i=0; i<5;i++){
+ 			this.guiNetJumps.setDigit(0, i);
+ 			this.guiNetNumbers.setDigit(0, i);
+ 		}
  		
- 		updateScore(0,this.guiNetNumbers);
      }
      
      public void updateScore(int updateTo, GuiNumbers score){
@@ -529,7 +529,8 @@ public class Game {
     			 currMenu = baseMenu;
     			 newGame = false;
     			 reset();
-    			 
+    			 updateScore(0, guiNetJumps);
+    			 updateScore(0, guiNetNumbers);
     			 state = State.INGAME;
     		 }
     	 }
