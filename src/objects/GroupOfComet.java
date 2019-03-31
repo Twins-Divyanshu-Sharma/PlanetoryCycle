@@ -148,10 +148,12 @@ public class GroupOfComet {
     	float angle = (float)(Math.random()*maxAngle);
     	float w = (float)(Math.random()*(maxW- minW) + minW );
     	Ulkapind ulka = new Ulkapind(ulkaMesh,size,sun.getPosition(),dis,angle,w);
+    	ulka.setRotation(0, -90, 0);
     	Path p = new Path(sun,ulka,pathPoints);
     	ulka.setPath(p);
     	return ulka;
     }
+    
     
     private void move(ArrayList<GameObject> gameComets, ArrayList<Path> cometOrbits, ArrayList<GameObject> collideWith){
     	for(int i=0; i<gameComets.size(); i++){
